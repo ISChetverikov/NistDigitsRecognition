@@ -1,11 +1,27 @@
 learnModel <- function(data, labels){
   
-  return(0);
+  lambda = 0.1
+  alpha = 0.05
+  n = ncol(data)
+  m = nrow(data)
+  all_theta = matrix(0,0,n+1)
+  
+  X = cbind(matrix(1,m,1), data)
+  for (digit in 0:9) {
+    init_theta = matrix(0, 1, n + 1)
+    theta = gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 100)
+    all_theta = rbind(all_theta, theta)
+  }
+  
+  return(all_theta)
 }
 
 testModel <- function(classifier, trainData){
+  n = ncol(trainData)
+  m = nrow(trainData)
+  X = cbind(matrix(1,m,1), trainData)
   
-  labels <- matrix(data = 1, nrow = nrow(trainData), ncol = 1)
+  labels = matrix(apply(sigmoid(X %*% t(classifier)), 1, which.max)-1, m, 1)
   
   return(labels)
 }
@@ -38,6 +54,15 @@ gradient <- function(theta, X, y, lambda){
   
   grad = 1/m * (colSums(matrix((sigmoidTemp - y),m,n)*X)+ lambda * thetaTemp);
   return(grad)
+}
+
+gradientDescent <- function(X, y, theta, lambda, alpha, num_iters){
+  
+  for (i in 1:num_iters) {
+    theta = theta - alpha * gradient(theta, X, y, lambda);
+  }
+  
+  return(theta)
 }
 
 clip <- function(x){
