@@ -19,9 +19,11 @@ print(dim(trainLabels))
 classifier <- learnModel(data = trainData, labels = trainLabels)
 predictedLabels <- testModel(classifier, trainData)
 
+digit = 7
+
 #calculate accuracy on training data
 print("accuracy on training data:\t")
-print(sum(predictedLabels == (trainLabels == 9))/length(trainLabels))
+print(sum(predictedLabels == (trainLabels == digit))/length(trainLabels))
 
 #calculate the following error metric for each class obtained on the train data:
 #Recall, precision, specificity, F-measure, FDR and ROC for each class separately. Use a package for ROC. 
@@ -41,7 +43,7 @@ predictedLabels <- testModel(classifier, testData)
 
 #calculate accuracy
 print("accuracy on test data:\t")
-print(sum(predictedLabels == (testLabels == 9))/length(testLabels))
+print(sum(predictedLabels == (testLabels == digit))/length(testLabels))
 
 #calculate the following error metric for each class obtained on the test data:
 #Recall, precision, specificity, F-measure, FDR and ROC for each class separately. Use a package for ROC. 

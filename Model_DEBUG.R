@@ -1,6 +1,8 @@
 learnModel <- function(data, labels){
   
-  Rprof(tmp <- tempfile(),interval = 0.001)
+  # Rprof(tmp <- tempfile(),interval = 0.001)
+  
+  digit = 7
   
   lambda = 0.01
   alpha = 0.001
@@ -9,28 +11,24 @@ learnModel <- function(data, labels){
   num_iters = 100
   n = ncol(data)
   m = nrow(data)
-  all_theta = matrix(0,0,n+1)
   
   X = cbind(matrix(1,m,1), data)
   init_theta = matrix(0, 1, n + 1)
   labels = labels
   
-  for (digit in 9:9) {
-    print(paste0('Digit: ', digit))
-    GD = gradientDescent(X, labels == digit, init_theta, lambda, alpha, epsilon, delta, num_iters)
-    theta = GD$theta;
-    plot(1:num_iters, GD$costFromIter)
-    all_theta = rbind(all_theta, theta)
-  }
   
+  print(paste0('Digit: ', digit))
+  GD = gradientDescent(X, labels == digit, init_theta, lambda, alpha, epsilon, delta, num_iters)
+  theta = GD$theta;
+  plot(1:num_iters, GD$costFromIter)
   
-  Rprof()
-  MyTimerTranspose=summaryRprof(tmp)$sampling.time
-  unlink(tmp)
+  # Rprof()
+  # MyTimerTranspose=summaryRprof(tmp)$sampling.time
+  # unlink(tmp)
+  # 
+  # print(paste0('Time: ', MyTimerTranspose))
   
-  print(paste0('Time: ', MyTimerTranspose))
-  
-  return(all_theta)
+  return(theta)
 }
 
 testModel <- function(classifier, trainData){

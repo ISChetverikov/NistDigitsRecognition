@@ -6,12 +6,15 @@ learnModel <- function(data, labels){
   cl <- makeCluster(no_cores)
   clusterExport(cl, "gradientDescent")
   clusterExport(cl, "gradient")
+  clusterExport(cl, "costFunction")
   clusterExport(cl, "sigmoid")
   clusterExport(cl, "clip")
   
-  lambda = 0.01
-  alpha = 0.001
-  num_iters = 10
+  lambda = 0.1
+  alpha = 0.005
+  epsilon = 0.1
+  delta = 0.95
+  num_iters = 150
   
   n = ncol(data)
   m = nrow(data)
@@ -22,7 +25,7 @@ learnModel <- function(data, labels){
 
   all_theta = parSapply(cl, 0:9,
             function(digit){
-              gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 10)
+              gradientDescent(X, labels == digit, init_theta, lambda, alpha, epsilon, delta, num_iters)
             })
            
   stopCluster(cl)
@@ -65,11 +68,23 @@ gradient <- function(theta, X, y, lambda){
   return(grad)
 }
 
-gradientDescent <- function(X, y, theta, lambda, alpha, num_iters){
-  for (i in 1:num_iters) {
-    theta = theta - alpha * gradient(theta, X, y, lambda);
-  }
+gradientDescent <- function(X, y, theta, lambda, alpha, epsilon, delta, num_iters){
+  prev = costFunction(theta, X, y, lambda)
   
+  for (i in 1:num_iters) {
+    grad = gradient(theta, X, y, lambda)
+    theta = theta - alpha * grad
+    
+    cost = costFunction(theta, X, y, lambda)
+    
+    if(cost > prev-epsilon*alpha*sum(grad^2))
+      alpha = delta*alpha
+    
+    if (abs(prev - cost) < 1e-7)
+      break
+    
+    prev = cost
+  }
   return( theta)
 }
 
