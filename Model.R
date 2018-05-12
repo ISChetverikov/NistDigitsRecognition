@@ -1,7 +1,10 @@
 learnModel <- function(data, labels){
   
-  # Profiler ON
-  Rprof(tmp <- tempfile(),interval = 0.001)
+  Debug = exists('DEBUG')
+  if(Debug){
+    Rprof(tmp <- tempfile(),interval = 0.001)
+  }
+  
   
   lambda = 0.1
   alpha = 0.1
@@ -12,18 +15,21 @@ learnModel <- function(data, labels){
   X = cbind(matrix(1,m,1), data)
   init_theta = matrix(0, 1, n + 1)
   
-  for (digit in 0:9) {
+  for (digit in 0:0) {
     print(paste0('Digit: ', digit))
     
-    theta = gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 300)
+    theta = gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 30)
     all_theta = rbind(all_theta, theta)
   }
   
-  Rprof()
-  MyTimerTranspose=summaryRprof(tmp)$sampling.time
-  unlink(tmp)
+  if(Debug){
+    Rprof()
+    MyTimerTranspose=summaryRprof(tmp)$sampling.time
+    unlink(tmp)
+    
+    print(paste0('Time: ', MyTimerTranspose))
+  }
   
-  print(paste0('Time: ', MyTimerTranspose))
   
   return(all_theta)
 }
