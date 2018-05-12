@@ -1,4 +1,7 @@
 source("load_data.R")
-source("Model.R")
-DEBUG <- TRUE
-source("ClassificationMain.R")
+#source("Model.R")
+source("Model_DEBUG.R")
+#source("ClassificationMain.R")
+source("ClassificationMain_DEBUG.R")
+gc()
+#rm(list = ls(all.names = TRUE))

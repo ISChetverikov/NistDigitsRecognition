@@ -1,32 +1,36 @@
 learnModel <- function(data, labels){
   
-  
-  no_cores <- detectCores() - 5
- 
-  cl <- makeCluster(no_cores)
-  clusterExport(cl, "gradientDescent")
-  clusterExport(cl, "gradient")
-  clusterExport(cl, "sigmoid")
-  clusterExport(cl, "clip")
+  Rprof(tmp <- tempfile(),interval = 0.001)
   
   lambda = 0.01
   alpha = 0.001
-  num_iters = 10
-  
+  epsilon = 0.1
+  delta = 0.95
+  num_iters = 100
   n = ncol(data)
   m = nrow(data)
+  all_theta = matrix(0,0,n+1)
   
   X = cbind(matrix(1,m,1), data)
   init_theta = matrix(0, 1, n + 1)
   labels = labels
-
-  all_theta = parSapply(cl, 0:9,
-            function(digit){
-              gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 10)
-            })
-           
-  stopCluster(cl)
-  return(t(all_theta))
+  
+  for (digit in 9:9) {
+    print(paste0('Digit: ', digit))
+    GD = gradientDescent(X, labels == digit, init_theta, lambda, alpha, epsilon, delta, num_iters)
+    theta = GD$theta;
+    plot(1:num_iters, GD$costFromIter)
+    all_theta = rbind(all_theta, theta)
+  }
+  
+  
+  Rprof()
+  MyTimerTranspose=summaryRprof(tmp)$sampling.time
+  unlink(tmp)
+  
+  print(paste0('Time: ', MyTimerTranspose))
+  
+  return(all_theta)
 }
 
 testModel <- function(classifier, trainData){
@@ -34,7 +38,7 @@ testModel <- function(classifier, trainData){
   m = nrow(trainData)
   X = cbind(matrix(1,m,1), trainData)
   
-  labels = matrix(apply(sigmoid(X %*% t(classifier)), 1, which.max)-1, m, 1)
+  labels = sigmoid(X %*% t(classifier)) > 0.5
   return(labels)
 }
 
@@ -65,12 +69,27 @@ gradient <- function(theta, X, y, lambda){
   return(grad)
 }
 
-gradientDescent <- function(X, y, theta, lambda, alpha, num_iters){
+gradientDescent <- function(X, y, theta, lambda, alpha, epsilon, delta, num_iters){
+  costs <- double(num_iters)
+  prev = costFunction(theta, X, y, lambda)
+  
+  
   for (i in 1:num_iters) {
-    theta = theta - alpha * gradient(theta, X, y, lambda);
+    grad = gradient(theta, X, y, lambda)
+    theta = theta - alpha * grad
+  
+    costs[i] = costFunction(theta, X, y, lambda)
+    
+    if(costs[i] > prev-epsilon*alpha*sum(grad^2))
+      alpha = delta*alpha
+    
+    if (abs(prev - costs[i]) < 1e-7)
+      break
+    
+    prev = costs[i]
   }
   
-  return( theta)
+  return(list("theta" = theta, "costFromIter" = costs))
 }
 
 clip <- function(x){
