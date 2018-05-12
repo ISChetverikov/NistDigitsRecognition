@@ -1,17 +1,29 @@
 learnModel <- function(data, labels){
   
+  # Profiler ON
+  Rprof(tmp <- tempfile(),interval = 0.001)
+  
   lambda = 0.1
-  alpha = 0.05
+  alpha = 0.1
   n = ncol(data)
   m = nrow(data)
   all_theta = matrix(0,0,n+1)
   
   X = cbind(matrix(1,m,1), data)
+  init_theta = matrix(0, 1, n + 1)
+  
   for (digit in 0:9) {
-    init_theta = matrix(0, 1, n + 1)
-    theta = gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 100)
+    print(paste0('Digit: ', digit))
+    
+    theta = gradientDescent(X, ifelse(labels == digit, 1, 0), init_theta, lambda, alpha, 300)
     all_theta = rbind(all_theta, theta)
   }
+  
+  Rprof()
+  MyTimerTranspose=summaryRprof(tmp)$sampling.time
+  unlink(tmp)
+  
+  print(paste0('Time: ', MyTimerTranspose))
   
   return(all_theta)
 }
@@ -52,7 +64,7 @@ gradient <- function(theta, X, y, lambda){
   m = nrow(y)
   n = ncol(X)
   
-  grad = 1/m * (colSums(matrix((sigmoidTemp - y),m,n)*X)+ lambda * thetaTemp);
+  grad = 1/m * (colSums(as.vector(sigmoidTemp - y)*X)+ lambda * thetaTemp);
   return(grad)
 }
 
