@@ -21,7 +21,7 @@ learnModel <- function(data, labels){
   
   # параметры градиентного спуска
   lambda = 0.1
-  alpha = 0.005
+  alpha = 0.001
   epsilon = 0.1
   delta = 0.95
   num_iters = 1

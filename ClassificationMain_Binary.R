@@ -19,7 +19,7 @@ print(dim(trainLabels))
 classifier <- learnModel(data = trainData, labels = trainLabels)
 predictedLabels <- testModel(classifier, trainData)
 
-digit = 7
+digit = 6
 
 #calculate accuracy on training data
 print("accuracy on training data:\t")

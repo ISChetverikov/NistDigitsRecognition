@@ -10,6 +10,6 @@ source("ClassificationMain.R")
 #source("Model_Binary.R")
 #source("ClassificationMain_Binary.R")
 
-# memory cleaning
+# Чистка памяти
 gc()
 rm(list = ls(all.names = TRUE))

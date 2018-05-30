@@ -20,7 +20,7 @@ classifier <- learnModel(data = trainData, labels = trainLabels)
 predictedLabels <- testModel(classifier, trainData)
 
 #calculate accuracy on training data
-print("accuracy on training data:\t")
+print('accuracy on training data:')
 print(sum(predictedLabels == trainLabels)/length(trainLabels))
 
 #calculate the following error metric for each class obtained on the train data:
@@ -40,7 +40,7 @@ print(dim(testLabels))
 predictedLabels <- testModel(classifier, testData)
 
 #calculate accuracy
-print("accuracy on test data:\t")
+print('accuracy on test data:')
 print(sum(predictedLabels == testLabels)/length(testLabels))
 
 #calculate the following error metric for each class obtained on the test data:

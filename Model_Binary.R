@@ -7,13 +7,13 @@ learnModel <- function(data, labels){
   
   # Returns:
   # (1)*(n+1) вектор параметров модели
-  digit = 7
+  digit = 6
   
   lambda = 0.01
   alpha = 0.001
   epsilon = 0.1
   delta = 0.95
-  num_iters = 100
+  num_iters = 1000
   n = ncol(data)
   m = nrow(data)
   
@@ -24,7 +24,7 @@ learnModel <- function(data, labels){
   print(paste0('Digit: ', digit))
   GD = gradientDescent(X, labels == digit, init_theta, lambda, alpha, epsilon, delta, num_iters)
   theta = GD$theta
-  plot(1:num_iters, GD$costFromIter)
+  plot(1:num_iters, GD$costFromIter, xlab="Iterations numbers",ylab="Cost function value")
   
   return(theta)
 }
